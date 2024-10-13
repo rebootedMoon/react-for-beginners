@@ -1,6 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
+import styles from "./Movie.module.css";
+
+const useTabs = (initialTab, allTabs) => {
+  const [currentIndex, setCurrentIndex] = useState(initialTab);
+
+  if (!allTabs || !Array.isArray(allTabs)) {
+    return;
+  }
+  return {
+    currentItem: allTabs[currentIndex],
+    changeItem: setCurrentIndex,
+  };
+};
+
 export default function Movie({
   id,
   name,
@@ -8,27 +22,44 @@ export default function Movie({
   series,
   stories,
 }) {
+  const content = [
+    {
+      tab: "Series",
+      content: series,
+    },
+    {
+      tab: "Stories",
+      content: stories,
+    },
+  ];
+
+  const { currentItem, changeItem } = useTabs(0, content);
+
   return (
-    <div>
-      <h2>
-        <Link to={`/character/${id}`}>{name} </Link>{" "}
-      </h2>
-      <img
-        src={`${thumbnail.path}.${thumbnail.extension}`}
-        alt="Movie Thumbnail"
-      />
-      <h3>Series</h3>
-      <ul>
-        {series.items.map((item, index) => (
-          <li key={index}>{item.name}</li>
-        ))}
-      </ul>
-      <h3>Stories</h3>
-      <ul>
-        {stories.items.map((item, index) => (
-          <li key={index}>{item.name}</li>
-        ))}
-      </ul>
+    <div className={styles.container}>
+      <div className={styles.imageSection}>
+        <h3 className={styles.title}>
+          <Link to={`/character/${id}`}>{name} </Link>{" "}
+        </h3>
+        <img
+          src={`${thumbnail.path}.${thumbnail.extension}`}
+          alt="Movie Thumbnail"
+        />
+      </div>
+      <div className={styles.contentSection}>
+        <div className={styles.tabs}>
+          {content.map((section, index) => (
+            <button onClick={() => changeItem(index)}>
+              {section.tab}
+            </button>
+          ))}
+        </div>
+        <ul className={styles.list}>
+          {currentItem.content.items.map((item, index) => (
+            <li key={index}>{item.name}</li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
